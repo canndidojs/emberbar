@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/preview.png" width="460" alt="EmberBar em uma barra de tarefas clara e em uma escura">
+  <img src="docs/preview.png" width="480" alt="EmberBar em uma barra de tarefas clara e em uma escura">
 </p>
 
 <p align="center"><sub>Ilustração. <b>5h</b> é o seu limite de 5 horas e <b>S</b> (<b>W</b> em inglês) é o limite semanal.</sub></p>

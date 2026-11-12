@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/preview.png" width="460" alt="EmberBar on a light and on a dark taskbar">
+  <img src="docs/preview.png" width="480" alt="EmberBar on a light and on a dark taskbar">
 </p>
 
 <p align="center"><sub>Illustration. <b>5h</b> is your 5-hour limit and <b>W</b> is your weekly limit.</sub></p>

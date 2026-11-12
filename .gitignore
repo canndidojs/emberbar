@@ -1,0 +1,17 @@
+bin/
+obj/
+publish/
+*.pdb
+*.user
+.vs/
+.vscode/
+.idea/
+.claude/
+make-icon.ps1
+auth.dat
+settings.json
+.credentials.json
+credentials*.json
+*.tmp
+*.bak
+*.log

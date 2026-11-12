@@ -51,6 +51,8 @@ Get-FileHash .\EmberBar.exe -Algorithm SHA256
 
 Hash of version 1.0.0: `B1C3DD736FB18A610362D0769E0E65CEF74BABC77EF95EC24AF883934D4C5405`
 
+[VirusTotal result](https://www.virustotal.com/gui/file/b1c3dd736fb18a610362d0769e0e65cef74babc77ef95ec24af883934d4c5405): 1 of 65 antivirus engines (Bkav) flags the file heuristically. This is common for small unsigned programs and is a false positive. Microsoft, Kaspersky, BitDefender, Avast and the others detected nothing. The code is open and you can build it yourself.
+
 ## Build it yourself
 
 You need the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) to build (`winget install Microsoft.DotNet.SDK.8`), and the .NET 8 Desktop Runtime to run it.

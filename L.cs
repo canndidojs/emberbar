@@ -166,7 +166,7 @@ static class L
             "Dê uma estrela ao EmberBar no GitHub!",
             "¡Dale una estrella a EmberBar en GitHub!"
         },
-        ["about.starbutton"] = new[] { "★ Star on GitHub", "★ Dar estrela no GitHub", "★ Dar estrella en GitHub" },
+        ["about.starbutton"] = new[] { "Star on GitHub", "Dar estrela no GitHub", "Dar estrella en GitHub" },
         ["about.trademark"] = new[]
         {
             "Independent app. Not affiliated with, endorsed by, or sponsored by Anthropic.",

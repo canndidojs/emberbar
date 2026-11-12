@@ -15,3 +15,5 @@ credentials*.json
 *.tmp
 *.bak
 *.log
+release/
+release-build/

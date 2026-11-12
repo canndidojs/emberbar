@@ -34,10 +34,24 @@ Claude has usage limits that reset every 5 hours and every week. Checking them m
 - **Colors that warn you.** Normal text below 70%, orange from 70%, red from 90%.
 - **Always shows something.** If an update fails, it keeps the last known values in gray instead of going blank.
 - **Private by design.** No telemetry, no analytics, and it talks to only two Anthropic addresses.
-- **Auditable.** About 1,100 lines of C# in 9 files, no NuGet packages, and the whole sign-in is readable in one file.
+- **Auditable.** About 1,250 lines of C# in 9 files, no NuGet packages, and the whole sign-in is readable in one file.
 - **Your language.** English, Português (Brasil) and Español, picked from the menu.
 
-## Quick start
+## Download
+
+1. Go to the [latest release](https://github.com/canndidojs/emberbar/releases/latest) and download `EmberBar.exe`.
+2. Double-click it. Nothing else to install: the .NET runtime is already inside the file.
+3. Windows may show a blue **"Windows protected your PC"** screen, because this small free project is not code-signed. Click **More info**, then **Run anyway**.
+
+To check the file is the one built from this code, compare its SHA-256 hash with the one on the release page:
+
+```powershell
+Get-FileHash .\EmberBar.exe -Algorithm SHA256
+```
+
+Hash of version 1.0.0: `B1C3DD736FB18A610362D0769E0E65CEF74BABC77EF95EC24AF883934D4C5405`
+
+## Build it yourself
 
 You need the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) to build (`winget install Microsoft.DotNet.SDK.8`), and the .NET 8 Desktop Runtime to run it.
 
@@ -50,7 +64,7 @@ dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile
 
 On the first run a small black-and-white window asks you to sign in. Click the button, sign in on the page that opens in your browser, and the window tells you EmberBar is running and closes by itself. The strip then stays on your taskbar.
 
-> There is no pre-built download on purpose: you build it from the code you can read.
+> Prefer not to trust a download? Build it from the code you can read, as above.
 
 ## Using it
 
@@ -138,6 +152,10 @@ It only reads your limits. It never sends messages to the model.
 1. **Unofficial endpoint.** The usage endpoint is not publicly documented and can change or disappear without notice. If that happens the strip stops updating and the tooltip says why.
 2. **Borrowed sign-in identity.** Anthropic offers no public sign-in for third-party apps, so EmberBar signs in with the same public OAuth client ID used by Anthropic's own command-line tool (Claude Code). Your account will list the session under that name. Anthropic may change or block this at any time, and it may not be covered by their terms. Use it at your own risk.
 3. **Stored session.** It is encrypted with DPAPI, but any program running as your Windows user can ask Windows to decrypt it. Read the code before you run it.
+
+## License
+
+[MIT](LICENSE). Free to use, change and share.
 
 ## Author
 

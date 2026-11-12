@@ -26,7 +26,7 @@ class DarkMenuRenderer : ToolStripProfessionalRenderer
     {
         if (!e.Item.Selected || !e.Item.Enabled) return;
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-        using var path = Rounded(new Rectangle(4, 1, e.Item.Width - 9, e.Item.Height - 3), 6);
+        using var path = Rounded(new Rectangle(4, 1, e.Item.Width - 9, e.Item.Height - 2), 6);
         using var brush = new SolidBrush(Hover);
         e.Graphics.FillPath(brush, path);
     }
@@ -38,6 +38,12 @@ class DarkMenuRenderer : ToolStripProfessionalRenderer
             bool isHint = item.ShortcutKeyDisplayString is { Length: > 0 } hint && hint == e.Text;
             e.TextColor = !item.Enabled || isHint ? Dim : Text;
         }
+        var size = TextRenderer.MeasureText(e.Graphics, e.Text, e.TextFont, new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding);
+        var r = e.TextRectangle;
+        r.Y = (e.Item.Height - size.Height) / 2 + 2;
+        r.Height = size.Height;
+        e.TextRectangle = r;
+        e.TextFormat |= TextFormatFlags.VerticalCenter;
         base.OnRenderItemText(e);
     }
 

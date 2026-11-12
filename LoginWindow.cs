@@ -3,23 +3,24 @@ namespace EmberBar;
 class LoginWindow : MinimalWindow
 {
     readonly Label _message;
-    readonly Button _button;
+    readonly FlatButton _button;
     CancellationTokenSource? _cts;
 
     public LoginWindow() : base(new Size(380, 290))
     {
-        AddLabel("EmberBar", new Font("Segoe UI Light", 22), Color.White, new Rectangle(0, 100, Width, 44), ContentAlignment.MiddleCenter);
-        _message = AddLabel("", new Font("Segoe UI", 10), Gray, new Rectangle(40, 152, 300, 56), ContentAlignment.TopCenter);
-        _button = AddButton("", new Rectangle(70, 222, 240, 40), OnButtonClick);
+        AddLabel("EmberBar", new Font("Segoe UI Semibold", 17), Color.White, new Rectangle(0, 104, Width, 34), ContentAlignment.MiddleCenter);
+        _message = AddLabel("", new Font("Segoe UI", 10), Soft, new Rectangle(40, 148, 300, 56), ContentAlignment.TopCenter);
+        _button = AddButton("", new Rectangle(70, 224, 240, 40), OnButtonClick);
         SetState(L.T("login.intro"), L.T("login.button"));
     }
 
-    void SetState(string message, string? button)
+    void SetState(string message, string? button, bool primary = true)
     {
         _message.Text = message;
         _button.Visible = button is not null;
         if (button is not null) _button.Text = button;
-        StyleButton(_button, false);
+        _button.Primary = primary;
+        _button.Invalidate();
     }
 
     async void OnButtonClick(object? sender, EventArgs e)
@@ -31,7 +32,7 @@ class LoginWindow : MinimalWindow
         }
 
         _cts = new CancellationTokenSource(TimeSpan.FromMinutes(3));
-        SetState(L.T("login.waiting"), L.T("login.cancel"));
+        SetState(L.T("login.waiting"), L.T("login.cancel"), false);
         try
         {
             await Auth.LoginAsync(_cts.Token);

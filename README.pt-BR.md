@@ -34,10 +34,24 @@ O Claude tem limites de uso que reiniciam a cada 5 horas e a cada semana. Para c
 - **Cores que avisam.** Texto normal abaixo de 70%, laranja a partir de 70% e vermelho a partir de 90%.
 - **Sempre mostra algo.** Se uma atualização falhar, ele mantém os últimos valores em cinza em vez de ficar em branco.
 - **Privado por projeto.** Sem telemetria, sem análise de uso, e só fala com dois endereços da Anthropic.
-- **Fácil de auditar.** Cerca de 1.100 linhas de C# em 9 arquivos, sem pacotes NuGet, e todo o login cabe em um arquivo.
+- **Fácil de auditar.** Cerca de 1.250 linhas de C# em 9 arquivos, sem pacotes NuGet, e todo o login cabe em um arquivo.
 - **No seu idioma.** English, Português (Brasil) e Español, escolhidos no menu.
 
-## Começando
+## Baixar
+
+1. Entre na [última versão](https://github.com/canndidojs/emberbar/releases/latest) e baixe o `EmberBar.exe`.
+2. Dê dois cliques. Não precisa instalar mais nada: o .NET já vem dentro do arquivo.
+3. O Windows pode mostrar uma tela azul **"O Windows protegeu o computador"**, porque este projeto pequeno e gratuito não tem assinatura de código. Clique em **Mais informações** e depois em **Executar assim mesmo**.
+
+Para conferir que o arquivo é o compilado deste código, compare o hash SHA-256 com o da página da versão:
+
+```powershell
+Get-FileHash .\EmberBar.exe -Algorithm SHA256
+```
+
+Hash da versão 1.0.0: `B1C3DD736FB18A610362D0769E0E65CEF74BABC77EF95EC24AF883934D4C5405`
+
+## Compilar você mesmo
 
 Você precisa do [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) para compilar (`winget install Microsoft.DotNet.SDK.8`) e do .NET 8 Desktop Runtime para rodar.
 
@@ -50,7 +64,7 @@ dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile
 
 Na primeira vez, uma janelinha preta e branca pede o login. Clique no botão, entre na página que abre no navegador, e a janela avisa que o EmberBar está rodando e fecha sozinha. A faixa fica na barra de tarefas.
 
-> Não existe um download pronto, de propósito: você compila a partir do código que pode ler.
+> Prefere não confiar em um download? Compile a partir do código que você pode ler, como acima.
 
 ## Como usar
 
@@ -138,6 +152,10 @@ Ele só lê os seus limites. Nunca envia mensagens ao modelo.
 1. **Endereço não oficial.** O endereço de uso não é documentado publicamente e pode mudar ou sumir sem aviso. Se isso acontecer, a faixa para de atualizar e o tooltip explica o motivo.
 2. **Identidade de login emprestada.** A Anthropic não oferece um login público para apps de terceiros, então o EmberBar entra com o mesmo identificador OAuth público usado pela ferramenta de linha de comando da própria Anthropic (Claude Code). A sua conta vai listar a sessão com esse nome. A Anthropic pode mudar ou bloquear isso a qualquer momento, e pode não ser coberto pelos termos dela. Use por sua conta e risco.
 3. **Sessão guardada.** Ela é criptografada com o DPAPI, mas qualquer programa rodando como o seu usuário do Windows pode pedir ao Windows para descriptografá-la. Leia o código antes de rodar.
+
+## Licença
+
+[MIT](LICENSE). Use, altere e compartilhe à vontade.
 
 ## Autor
 

@@ -1,0 +1,45 @@
+name: mac-release
+
+# Runs only when YOU push a tag like mac-v0.1.0. Nothing is published otherwise.
+on:
+  push:
+    tags: ["mac-v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: macos-latest
+    permissions:
+      contents: write   # only this job can create the release
+    defaults:
+      run:
+        working-directory: mac
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Tag must match the app version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          # Strict X.Y.Z only; the tag is untrusted input, so it goes through an env var.
+          [[ "$TAG" =~ ^mac-v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "bad tag"; exit 1; }
+          PLIST=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" packaging/Info.plist)
+          [ "mac-v$PLIST" = "$TAG" ] || { echo "Info.plist version $PLIST does not match $TAG"; exit 1; }
+
+      - name: Unit tests
+        run: swift test
+      - name: Package
+        run: bash package.sh
+
+      - name: Create release (draft, so you can review before it goes public)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG" dist/EmberBar-mac.zip dist/EmberBar-mac.zip.sha256 \
+            --repo "$GITHUB_REPOSITORY" --draft --title "EmberBar for Mac ${TAG#mac-v} (beta)" \
+            --notes "Beta. Ad-hoc signed, not notarized. Verify the SHA-256 in the attached .sha256 file. See the README for how to open it."

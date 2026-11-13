@@ -104,7 +104,15 @@ enum HistoryWindow {
             let w = NSWindow(contentViewController: NSHostingController(rootView: HistoryView(recorder: recorder, settings: settings)))
             w.styleMask = [.titled, .closable]
             w.isReleasedWhenClosed = false
-            w.center()
+            w.setContentSize(NSSize(width: 560, height: 470))
+            w.center() // after the size is set, otherwise it centers a zero-size window
+            // Never let the window extend past the visible screen (small displays).
+            if let visible = (w.screen ?? NSScreen.main)?.visibleFrame {
+                var f = w.frame
+                f.origin.x = max(visible.minX, min(f.origin.x, visible.maxX - f.width))
+                f.origin.y = max(visible.minY, min(f.origin.y, visible.maxY - f.height))
+                w.setFrame(f, display: false)
+            }
             window = w
             w.makeKeyAndOrderFront(nil)
         }

@@ -53,6 +53,17 @@ Hash da versão 1.0.0: `B1C3DD736FB18A610362D0769E0E65CEF74BABC77EF95EC24AF88393
 
 [Resultado no VirusTotal](https://www.virustotal.com/gui/file/b1c3dd736fb18a610362d0769e0e65cef74babc77ef95ec24af883934d4c5405): 1 de 65 antivírus (Bkav) marca o arquivo por heurística. Isso é comum em programas pequenos sem assinatura e é um falso positivo. Microsoft, Kaspersky, BitDefender, Avast e os demais não detectaram nada. O código é aberto e você pode compilar sozinho.
 
+## macOS (beta)
+
+O EmberBar também tem uma versão para Mac, que mostra os dois limites na **barra de menu**. Ela está em beta e ainda foi pouco testada em Macs reais.
+
+1. Baixe o `EmberBar-mac.zip` na [página de versões](https://github.com/canndidojs/emberbar/releases) (tags `mac-v...`) e descompacte.
+2. Confira o hash: `shasum -a 256 EmberBar-mac.zip` deve bater com o `EmberBar-mac.zip.sha256` da versão.
+3. Arraste o `EmberBar.app` para a pasta Aplicativos e abra com **clique direito > Abrir**.
+4. O app não é notarizado pela Apple (isso custa US$ 99 por ano e o projeto é gratuito). Se o macOS bloquear, abra **Ajustes do Sistema > Privacidade e Segurança** e clique em **Abrir mesmo assim**.
+
+Requer macOS 13 ou mais recente, Intel ou Apple Silicon. O app roda no App Sandbox da Apple e guarda a sessão no Chaveiro. Veja o [SECURITY.md](SECURITY.md). O código fica na pasta [`mac/`](mac/).
+
 ## Compilar você mesmo
 
 Você precisa do [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) para compilar (`winget install Microsoft.DotNet.SDK.8`) e do .NET 8 Desktop Runtime para rodar.

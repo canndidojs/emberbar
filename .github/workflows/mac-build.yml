@@ -1,0 +1,44 @@
+name: mac-build
+
+on:
+  push:
+    paths: ["mac/**", ".github/workflows/mac-build.yml"]
+  pull_request:
+    paths: ["mac/**", ".github/workflows/mac-build.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: mac
+    steps:
+      - uses: actions/checkout@v4
+      - name: Swift version
+        run: swift --version
+      - name: Build (release)
+        run: swift build -c release
+      - name: Unit tests
+        run: swift test
+
+      # Best effort: run the app with fake values and screenshot the menu bar.
+      # A failure here must not fail the build; the screenshot is only an aid.
+      - name: Screenshot (demo mode)
+        continue-on-error: true
+        run: |
+          mkdir -p ../shots
+          EMBERBAR_DEMO=1 .build/release/EmberBar > ../shots/app.log 2>&1 &
+          sleep 12
+          screencapture -x ../shots/full.png || true
+          # Top strip only (menu bar), full width.
+          W=$(sips -g pixelWidth ../shots/full.png | awk '/pixelWidth/ {print $2}')
+          sips --cropOffset 0 0 -c 80 "$W" ../shots/full.png --out ../shots/menubar.png || true
+          ls -la ../shots
+          pkill EmberBar || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mac-screenshots
+          path: shots/
+          if-no-files-found: ignore

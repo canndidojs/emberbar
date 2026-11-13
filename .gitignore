@@ -17,3 +17,19 @@ credentials*.json
 *.log
 release/
 release-build/
+
+# macOS / Swift build output and local data (never commit)
+.build/
+.swiftpm/
+mac/dist/
+*.xcuserstate
+xcuserdata/
+.DS_Store
+*.p12
+*.pem
+*.mobileprovision
+.env
+.env.*
+auth.dat
+history.json
+UsageHistory*.json

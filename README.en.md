@@ -53,6 +53,17 @@ Hash of version 1.0.0: `B1C3DD736FB18A610362D0769E0E65CEF74BABC77EF95EC24AF88393
 
 [VirusTotal result](https://www.virustotal.com/gui/file/b1c3dd736fb18a610362d0769e0e65cef74babc77ef95ec24af883934d4c5405): 1 of 65 antivirus engines (Bkav) flags the file heuristically. This is common for small unsigned programs and is a false positive. Microsoft, Kaspersky, BitDefender, Avast and the others detected nothing. The code is open and you can build it yourself.
 
+## macOS (beta)
+
+EmberBar also has a Mac version that shows both limits in the **menu bar**. It is in beta and has had little testing on real Macs.
+
+1. Download `EmberBar-mac.zip` from the [releases page](https://github.com/canndidojs/emberbar/releases) (tags `mac-v...`) and unzip it.
+2. Check the hash: `shasum -a 256 EmberBar-mac.zip` must match the release's `EmberBar-mac.zip.sha256`.
+3. Drag `EmberBar.app` to Applications and open it with **right-click > Open**.
+4. The app is not notarized by Apple (that costs US$ 99 a year and this project is free). If macOS blocks it, open **System Settings > Privacy & Security** and click **Open Anyway**.
+
+Requires macOS 13 or later, Intel or Apple Silicon. The app runs in Apple's App Sandbox and keeps the session in the Keychain. See [SECURITY.md](SECURITY.md). The code is in the [`mac/`](mac/) folder.
+
 ## Build it yourself
 
 You need the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) to build (`winget install Microsoft.DotNet.SDK.8`), and the .NET 8 Desktop Runtime to run it.

@@ -81,6 +81,7 @@ Clique com o botão direito na faixa para abrir o menu.
 | **Idioma** | English, Português (Brasil) ou Español. Na primeira vez segue o idioma do Windows. |
 | **Alertas de uso** | Notificação do Windows quando um limite chega a 70%, 90% e 100%. Ligado por padrão. |
 | **Iniciar com o Windows** | Desligado por padrão. Mostra *Ligado* ou *Desligado*. |
+| **Histórico de uso** | Gráfico dos últimos 6 meses: média dos picos diários do limite de 5h e maior valor do limite semanal de cada mês. O registro começa quando o app começa a rodar (a API não tem histórico). Há um botão para apagar tudo. |
 | **Abrir página de uso** | Abre a sua página de uso no navegador. |
 | **Sobre o EmberBar** | Versão, autor e um link para dar estrela no projeto. |
 | **Sair** | Fecha o app. |
@@ -102,7 +103,7 @@ Quando sai uma versão nova, aparece um item *Atualização disponível* no topo
 |---|---|
 | **Rede** | Só `api.anthropic.com` (o seu uso), `platform.claude.com` (login e renovação da sessão) e `api.github.com` (para saber se há versão nova, ao abrir e a cada 12 horas; não envia nada além do nome e da versão do app). Quem abre a página de login é o seu navegador, e não o app. |
 | **Telemetria** | Nenhuma. Sem análise de uso e sem relatório de falhas. |
-| **Guarda** | `%APPDATA%\EmberBar\auth.dat`, a sua sessão, criptografada com o DPAPI do Windows para só o seu usuário conseguir ler. E `%APPDATA%\EmberBar\settings.json`, com intervalo, tamanho, idioma e opções. |
+| **Guarda** | `%APPDATA%\EmberBar\auth.dat`, a sua sessão, criptografada com o DPAPI do Windows para só o seu usuário conseguir ler. E `%APPDATA%\EmberBar\settings.json`, com intervalo, tamanho, idioma e opções. E `%APPDATA%\EmberBar\history.json`, com o pico de uso de cada dia (só os números, guardados neste PC por cerca de 6 meses). |
 | **Registro** | Só se você ligar *Iniciar com o Windows*: um valor em `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`. |
 | **Escuta** | Uma única requisição em `localhost`, em uma porta aleatória, só enquanto a janela de login espera por você. |
 | **Tela** | Lê a cor de **um pixel** da barra de tarefas para o fundo da faixa combinar com ela. Nada é salvo nem enviado. |

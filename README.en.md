@@ -81,6 +81,7 @@ Right-click the strip to open the menu.
 | **Language** | English, Português (Brasil) or Español. The first run follows your Windows language. |
 | **Usage alerts** | Windows notification when a limit reaches 70%, 90% and 100%. On by default. |
 | **Start with Windows** | Off by default. Shows *On* or *Off*. |
+| **Usage history** | Chart of the last 6 months: the average of the daily peaks of the 5-hour limit and the highest weekly-limit value of each month. Recording starts when the app starts running (the API has no history). A button deletes everything. |
 | **Open usage page** | Opens your usage page in the browser. |
 | **About EmberBar** | Version, author, and a link to star the project. |
 | **Quit** | Closes the app. |
@@ -102,7 +103,7 @@ When a new version is released, an *Update available* item appears at the top of
 |---|---|
 | **Network** | Only `api.anthropic.com` (your usage), `platform.claude.com` (sign-in and session renewal) and `api.github.com` (to see whether a new version exists, at startup and every 12 hours; it sends only the app name and version). Your browser, not the app, opens the sign-in page. |
 | **Telemetry** | None. No analytics and no crash reports. |
-| **Stores** | `%APPDATA%\EmberBar\auth.dat`, your session, encrypted with Windows DPAPI so only your Windows user can read it. And `%APPDATA%\EmberBar\settings.json`, with your interval, size, language and options. |
+| **Stores** | `%APPDATA%\EmberBar\auth.dat`, your session, encrypted with Windows DPAPI so only your Windows user can read it. And `%APPDATA%\EmberBar\settings.json`, with your interval, size, language and options. And `%APPDATA%\EmberBar\history.json`, with each day's usage peak (just the numbers, kept on this PC for about 6 months). |
 | **Registry** | Only if you turn on *Start with Windows*: one value under `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`. |
 | **Listens** | One request on `localhost`, on a random port, only while the sign-in window is waiting for you. |
 | **Screen** | Reads the color of **one pixel** of the taskbar so the strip's background matches it. Nothing is saved or sent. |

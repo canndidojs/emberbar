@@ -92,6 +92,8 @@ class TaskbarStrip : Form
         Invalidate();
     }
 
+    public void HideCard() => _card.Dismiss();
+
     void HideAll()
     {
         _card.Dismiss();

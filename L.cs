@@ -12,6 +12,8 @@ static class L
 
     static int _index;
 
+    public static CultureInfo Culture => Cultures[_index];
+
     public static string Code => Languages[_index].Code;
 
     public static void Set(string? code)
@@ -59,6 +61,21 @@ static class L
         ["menu.startup"] = new[] { "Start with Windows", "Iniciar com o Windows", "Iniciar con Windows" },
         ["on"] = new[] { "On", "Ligado", "Activado" },
         ["off"] = new[] { "Off", "Desligado", "Desactivado" },
+        ["menu.history"] = new[] { "Usage history", "Histórico de uso", "Historial de uso" },
+        ["hist.title"] = new[] { "Usage history", "Histórico de uso", "Historial de uso" },
+        ["hist.sub"] = new[] { "Last 6 months", "Últimos 6 meses", "Últimos 6 meses" },
+        ["hist.five"] = new[] { "5-hour limit (average of the daily peaks)", "Limite de 5h (média dos picos diários)", "Límite de 5h (promedio de los picos diarios)" },
+        ["hist.week"] = new[] { "Weekly limit (highest of the month)", "Limite semanal (maior valor do mês)", "Límite semanal (mayor valor del mes)" },
+        ["hist.day"] = new[] { "1 day", "1 dia", "1 día" },
+        ["hist.days"] = new[] { "{0} days", "{0} dias", "{0} días" },
+        ["hist.note"] = new[]
+        {
+            "The API keeps no history, so EmberBar records it on this PC from now on. Nothing leaves your computer.",
+            "A API não guarda histórico, então o EmberBar registra aqui no PC a partir de agora. Nada sai do seu computador.",
+            "La API no guarda historial, así que EmberBar lo registra en este PC desde ahora. Nada sale de tu computador."
+        },
+        ["hist.clear"] = new[] { "Delete history", "Apagar histórico", "Borrar historial" },
+        ["hist.clearask"] = new[] { "Delete all saved usage history?", "Apagar todo o histórico de uso salvo?", "¿Borrar todo el historial de uso guardado?" },
         ["menu.usage"] = new[] { "Open usage page", "Abrir página de uso", "Abrir página de uso" },
         ["menu.about"] = new[] { "About EmberBar", "Sobre o EmberBar", "Acerca de EmberBar" },
         ["menu.quit"] = new[] { "Quit", "Sair", "Salir" },

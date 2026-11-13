@@ -64,6 +64,7 @@ class TrayApp : ApplicationContext
     readonly int[] _alerted = { -1, -1 };
     static readonly int[] Thresholds = { 70, 90, 100 };
     string? _updateTag, _updateUrl, _toastedTag;
+    readonly ToolStripMenuItem _historyItem = new() { Padding = ItemPadding };
     readonly ToolStripMenuItem _usageItem = new() { Padding = ItemPadding };
     readonly ToolStripMenuItem _aboutItem = new() { Padding = ItemPadding };
     readonly ToolStripMenuItem _quitItem = new() { Padding = ItemPadding };
@@ -125,6 +126,7 @@ class TrayApp : ApplicationContext
         _refreshItem.Click += async (_, _) => await RefreshAsync();
         _signItem.Click += (_, _) => SignInOrOut();
         _startupItem.Click += (_, _) => ToggleStartup();
+        _historyItem.Click += (_, _) => { using var history = new HistoryWindow(); history.ShowDialog(); };
         _usageItem.Click += (_, _) => Open(UsagePage);
         _aboutItem.Click += (_, _) => { using var about = new AboutWindow(); about.ShowDialog(); };
         _quitItem.Click += (_, _) => Quit();
@@ -152,13 +154,14 @@ class TrayApp : ApplicationContext
         menu.Items.Add(_startupItem);
         menu.Items.Add(new ToolStripSeparator());
 
+        menu.Items.Add(_historyItem);
         menu.Items.Add(_usageItem);
         menu.Items.Add(_aboutItem);
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(_quitItem);
 
         ApplyLanguage();
-        menu.Opening += (_, _) => ApplyLanguage();
+        menu.Opening += (_, _) => { ApplyLanguage(); _strip.HideCard(); };
 
         var watcher = new System.Windows.Forms.Timer { Interval = 50 };
         bool armed = false;
@@ -202,6 +205,7 @@ class TrayApp : ApplicationContext
         _notifyItem.ShortcutKeyDisplayString = L.T(_settings.Notify ? "on" : "off");
         _updateItem.Visible = _updateTag is not null;
         if (_updateTag is not null) _updateItem.Text = L.T("menu.update", _updateTag);
+        _historyItem.Text = L.T("menu.history");
         _usageItem.Text = L.T("menu.usage");
         _aboutItem.Text = L.T("menu.about");
         _quitItem.Text = L.T("menu.quit");
@@ -287,6 +291,7 @@ class TrayApp : ApplicationContext
             _lastAt = at;
             _failures = 0;
             Present(() => (usage, Tip(usage, L.T("tip.updated", L.Clock(at))), false));
+            History.Record(usage);
             CheckAlerts(usage);
         }
         catch (Exception ex)

@@ -77,14 +77,14 @@ class TaskbarStrip : Form
         IntPtr tray = FindWindowEx(bar, IntPtr.Zero, "TrayNotifyWnd", null);
         if (tray == IntPtr.Zero || !GetWindowRect(tray, out RECT n)) { if (Visible) Hide(); return; }
 
-        int height = b.Bottom - b.Top;
+        int height = b.Bottom - b.Top - 1; // keep the taskbar's 1px top border visible
         PrepareFonts(height);
         int width = Draw(null, height);
         int x = n.Left - width - 2;
 
-        SampleBackground(x - 4, b.Top + 2);
+        SampleBackground(x - 4, b.Top + 1 + height / 2);
         if (!Visible) base.Show();
-        SetWindowPos(Handle, HWND_TOPMOST, x, b.Top, width, height, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+        SetWindowPos(Handle, HWND_TOPMOST, x, b.Top + 1, width, height, SWP_NOACTIVATE | SWP_SHOWWINDOW);
         Invalidate();
     }
 

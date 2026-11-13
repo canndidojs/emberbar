@@ -40,6 +40,22 @@ enum Demo {
         fiveHour: UsageWindow(percent: 72, resetsAt: Date().addingTimeInterval(3 * 3600)),
         week: UsageWindow(percent: 38, resetsAt: Date().addingTimeInterval(4 * 86400))
     )
+
+    /// `EMBERBAR_DEMO_WINDOW=history` opens the history window at launch (for the CI screenshot).
+    static let opensHistory = enabled && ProcessInfo.processInfo.environment["EMBERBAR_DEMO_WINDOW"] == "history"
+
+    /// Six months of made-up daily peaks, in memory only. Demo mode never reads or writes the real history file.
+    static let history: UsageHistory = {
+        var h = UsageHistory()
+        let now = Date()
+        for offset in stride(from: 170, through: 0, by: -3) {
+            guard let day = Calendar.current.date(byAdding: .day, value: -offset, to: now) else { continue }
+            let five = Double(35 + (offset * 7) % 55), week = Double(15 + (offset * 13) % 70)
+            h.record(Usage(fiveHour: UsageWindow(percent: five, resetsAt: nil),
+                           week: UsageWindow(percent: week, resetsAt: nil)), now: day)
+        }
+        return h
+    }()
 }
 
 /// Observable usage state: keeps the last good reading (shown stale on failure) and polls with backoff.
@@ -54,6 +70,8 @@ final class UsageStore: ObservableObject {
     private var busy = false
     private var loop: Task<Void, Never>?
     var baseInterval: TimeInterval = 300
+    /// Called after each successful real reading (never for demo values).
+    var onSuccess: ((Usage) -> Void)?
 
     func start() {
         guard loop == nil else { return }
@@ -89,7 +107,9 @@ final class UsageStore: ObservableObject {
             return
         }
         do {
-            usage = try await UsageClient.fetch()
+            let fresh = try await UsageClient.fetch()
+            usage = fresh
+            onSuccess?(fresh)
             lastUpdate = Date()
             stale = false
             message = ""

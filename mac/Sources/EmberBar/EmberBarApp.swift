@@ -7,6 +7,7 @@ struct EmberBarApp: App {
     @StateObject private var store = UsageStore()
     @StateObject private var settings = Settings()
     @StateObject private var updater = Updater()
+    @StateObject private var recorder = Recorder()
     @State private var signedIn = Demo.enabled || Auth.signedIn
     @State private var status = ""
 
@@ -20,7 +21,10 @@ struct EmberBarApp: App {
             label
                 .task {
                     store.baseInterval = settings.interval
+                    let recorder = recorder, settings = settings
+                    store.onSuccess = { usage in recorder.handle(usage, notify: settings.notify) }
                     store.start()
+                    if Demo.opensHistory { HistoryWindow.show(recorder: recorder, settings: settings) }
                     await checkUpdatesForever()
                 }
         }
@@ -56,7 +60,9 @@ struct EmberBarApp: App {
             Picker(L.t("menu.interval"), selection: intervalBinding) {
                 ForEach(Polling.intervals, id: \.self) { Text(TimeText.remaining($0)).tag($0) }
             }
+            Button(L.t("menu.history")) { HistoryWindow.show(recorder: recorder, settings: settings) }
             Button(L.t("menu.usage")) { NSWorkspace.shared.open(Self.usagePage) }
+            Toggle(L.t("menu.notify"), isOn: $settings.notify)
         }
         Picker(L.t("menu.language"), selection: $settings.language) {
             ForEach(Lang.allCases, id: \.self) { Text($0.displayName).tag($0) }

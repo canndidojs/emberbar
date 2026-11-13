@@ -13,7 +13,8 @@ Do not open a public issue for security problems. You will get a reply as soon a
   - macOS: in the Keychain, device-only (`ThisDeviceOnly`), not synced.
 - Tokens are sent only to `api.anthropic.com` and `platform.claude.com`, over HTTPS.
 - The macOS update check contacts `api.github.com` (public releases list). It sends no account data, token or identifier, and it never downloads or runs anything: it only shows a link to the release page, which you open yourself.
-- Preferences (language, interval, open at login) stay in the app's local sandbox container.
+- Preferences (language, interval, alerts, open at login) and the usage history (daily percentages only, no tokens or account data) stay in the app's local sandbox container, readable by your user only. The history file is size-limited and validated when read, and **Clear history** deletes it. It is never synced or uploaded.
+- Demo mode (used only for CI screenshots) shows made-up values in memory and never reads or writes the real history.
 - No telemetry, no analytics, no third-party servers, no third-party packages.
 
 ## macOS hardening

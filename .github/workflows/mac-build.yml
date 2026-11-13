@@ -45,7 +45,7 @@ jobs:
         continue-on-error: true
         run: |
           mkdir -p ../shots
-          EMBERBAR_DEMO=1 dist/EmberBar.app/Contents/MacOS/EmberBar > ../shots/app.log 2>&1 &
+          EMBERBAR_DEMO=1 EMBERBAR_DEMO_WINDOW=history dist/EmberBar.app/Contents/MacOS/EmberBar > ../shots/app.log 2>&1 &
           sleep 12
           screencapture -x ../shots/full.png || true
           ls -la ../shots

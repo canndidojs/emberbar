@@ -15,6 +15,10 @@ final class Settings: ObservableObject {
         didSet { defaults.set(interval, forKey: "interval") }
     }
 
+    @Published var notify: Bool {
+        didSet { defaults.set(notify, forKey: "notify") }
+    }
+
     @Published private(set) var launchAtLogin: Bool
 
     init() {
@@ -22,6 +26,7 @@ final class Settings: ObservableObject {
         let saved = UserDefaults.standard.double(forKey: "interval")
 
         language = lang
+        notify = UserDefaults.standard.object(forKey: "notify") as? Bool ?? true
         interval = Polling.intervals.contains(saved) ? saved : 300
         launchAtLogin = SMAppService.mainApp.status == .enabled
         L.current = lang

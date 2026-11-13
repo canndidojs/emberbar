@@ -2,9 +2,9 @@ name: mac-build
 
 on:
   push:
-    paths: ["mac/**", ".github/workflows/mac-build.yml"]
+    paths: ["mac/**", ".github/**", "SECURITY.md", ".gitignore"]
   pull_request:
-    paths: ["mac/**", ".github/workflows/mac-build.yml"]
+    paths: ["mac/**", ".github/**", "SECURITY.md", ".gitignore"]
   workflow_dispatch:
 
 # Least privilege: the workflow only reads the repository. No secrets are used.
@@ -12,6 +12,16 @@ permissions:
   contents: read
 
 jobs:
+  privacy:
+    # Blocks pushes that contain credentials, personal e-mails/paths or non-noreply commit authors.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - run: bash .github/scripts/privacy-guard.sh
+
   build:
     runs-on: macos-latest
     defaults:

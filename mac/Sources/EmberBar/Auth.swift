@@ -19,13 +19,13 @@ enum AuthError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .timedOut: return "Sign-in timed out. Try again."
-        case .storage: return "Could not save the session in the Keychain."
-        case .notSignedIn: return "Not signed in."
-        case .expired: return "Session expired. Sign in again."
-        case .badResponse: return "Invalid response from the sign-in page."
-        case .server(let code): return "Server error (\(code))."
-        case .noRefresh: return "The server did not return a refresh token."
+        case .timedOut: return L.t("err.timeout")
+        case .storage: return L.t("err.storage")
+        case .notSignedIn: return L.t("err.notsignedin")
+        case .expired: return L.t("err.expired")
+        case .badResponse: return L.t("err.badresponse")
+        case .server(let code): return L.t("err.server", code)
+        case .noRefresh: return L.t("err.norefresh")
         }
     }
 }

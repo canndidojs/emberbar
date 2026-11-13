@@ -7,8 +7,8 @@ enum UsageClientError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .rateLimited: return "Rate limited by the server."
-        case .http(let code): return "HTTP error \(code)."
+        case .rateLimited: return L.t("err.rate")
+        case .http(let code): return L.t("err.http", code)
         }
     }
 }

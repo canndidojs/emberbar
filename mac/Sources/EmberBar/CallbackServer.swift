@@ -92,12 +92,12 @@ final class CallbackServer: @unchecked Sendable {
 
             switch CallbackRequest.evaluate(raw: text, expectedState: self.expectedState, port: self.port) {
             case .reject(let status):
-                self.reply(conn, status == 404 ? "Not found." : "Invalid request.", status: status)
+                self.reply(conn, L.t(status == 404 ? "web.notfound" : "web.invalid"), status: status)
             case .providerError:
-                self.reply(conn, "Sign-in failed. You can close this tab.", status: 400)
+                self.reply(conn, L.t("web.failed"), status: 400)
                 self.finish(.failure(AuthError.badResponse))
             case .code(let code):
-                self.reply(conn, "Signed in. You can close this tab.", status: 200)
+                self.reply(conn, L.t("web.ok"), status: 200)
                 self.finish(.success(code))
             }
         }

@@ -22,9 +22,9 @@ enum StatusImage {
                 }
             }
             segments = [
-                ("5h \(Int(u.fiveHour.percent.rounded()))%", color(u.fiveHour.percent)),
+                ("\(L.t("short.five")) \(Int(u.fiveHour.percent.rounded()))%", color(u.fiveHour.percent)),
                 (" · ", base),
-                ("W \(Int(u.week.percent.rounded()))%", color(u.week.percent)),
+                ("\(L.t("short.week")) \(Int(u.week.percent.rounded()))%", color(u.week.percent)),
             ]
         } else {
             segments = [(signedIn ? "EmberBar …" : "EmberBar", .secondaryLabelColor)]

@@ -27,9 +27,10 @@ enum SecureSession {
         return URLSession(configuration: config, delegate: delegate, delegateQueue: nil)
     }()
 
-    private static let allowedHosts: Set<String> = ["api.anthropic.com", "platform.claude.com"]
+    /// Hosts that may receive credentials. Anything else is refused.
+    static let credentialHosts: Set<String> = ["api.anthropic.com", "platform.claude.com"]
 
-    static func data(for request: URLRequest) async throws -> (Data, HTTPURLResponse) {
+    static func data(for request: URLRequest, allowedHosts: Set<String> = credentialHosts) async throws -> (Data, HTTPURLResponse) {
         guard let url = request.url, url.scheme == "https", let host = url.host, allowedHosts.contains(host) else {
             throw URLError(.unsupportedURL)
         }

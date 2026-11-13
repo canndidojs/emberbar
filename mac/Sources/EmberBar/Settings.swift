@@ -18,14 +18,13 @@ final class Settings: ObservableObject {
     @Published private(set) var launchAtLogin: Bool
 
     init() {
-        let stored = defaults.string(forKey: "language").flatMap(Lang.init(rawValue:))
-        language = stored ?? .detect()
-        L.current = language
+        let lang = UserDefaults.standard.string(forKey: "language").flatMap(Lang.init(rawValue:)) ?? .detect()
+        let saved = UserDefaults.standard.double(forKey: "interval")
 
-        let saved = defaults.double(forKey: "interval")
+        language = lang
         interval = Polling.intervals.contains(saved) ? saved : 300
-
         launchAtLogin = SMAppService.mainApp.status == .enabled
+        L.current = lang
     }
 
     func setLaunchAtLogin(_ on: Bool) {

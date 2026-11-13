@@ -32,6 +32,15 @@ static class L
 
     public static string Clock(DateTime t) => t.ToString(_index == 0 ? "h:mm tt" : "HH:mm", Cultures[_index]);
 
+    public static string Remaining(TimeSpan t, bool compact)
+    {
+        int days = (int)t.TotalDays, hours = t.Hours, mins = t.Minutes;
+        if (t.TotalMinutes < 1) return compact ? "<1m" : "<1 min";
+        if (days > 0) return compact ? $"{days}d{hours}h" : $"{days}d {hours}h";
+        if (t.TotalHours >= 1) return compact ? $"{(int)t.TotalHours}h{mins:00}" : $"{(int)t.TotalHours}h {mins:00}min";
+        return compact ? $"{mins}m" : $"{mins} min";
+    }
+
     public static string Time(DateTimeOffset t, bool withDay) =>
         t.ToString((withDay ? "ddd " : "") + (_index == 0 ? "h:mm tt" : "HH:mm"), Cultures[_index]);
 
@@ -71,7 +80,17 @@ static class L
             "Últimos valores conocidos, de {0}. Último error: {1}"
         },
         ["tip.weekly"] = new[] { "Weekly", "Semanal", "Semanal" },
-        ["tip.resets"] = new[] { " (resets {0})", " (reinicia {0})", " (se restablece {0})" },
+        ["tip.resets"] = new[] { " (resets {0}, in {1})", " (reinicia {0}, em {1})", " (se restablece {0}, en {1})" },
+        ["tip.resets0"] = new[] { " (resets {0})", " (reinicia {0})", " (se restablece {0})" },
+        ["menu.showreset"] = new[] { "Show time until reset", "Mostrar tempo até resetar", "Mostrar tiempo hasta el reinicio" },
+        ["menu.notify"] = new[] { "Usage alerts", "Alertas de uso", "Alertas de uso" },
+        ["menu.update"] = new[] { "Update available: {0}", "Atualização disponível: {0}", "Actualización disponible: {0}" },
+        ["alert.level"] = new[] { "{0} usage reached {1}%.{2}", "Uso {0} chegou a {1}%.{2}", "El uso {0} llegó al {1}%.{2}" },
+        ["alert.full"] = new[] { "{0} limit reached.{1}", "Limite {0} atingido.{1}", "Límite {0} alcanzado.{1}" },
+        ["alert.in"] = new[] { " Resets in {0}.", " Reinicia em {0}.", " Se restablece en {0}." },
+        ["alert.five"] = new[] { "5-hour", "de 5h", "de 5h" },
+        ["alert.week"] = new[] { "weekly", "semanal", "semanal" },
+        ["update.toast"] = new[] { "EmberBar {0} is available. Click to download.", "EmberBar {0} disponível. Clique para baixar.", "EmberBar {0} disponible. Haz clic para descargar." },
 
         ["err.rate"] = new[]
         {

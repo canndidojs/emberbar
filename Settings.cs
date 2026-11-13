@@ -10,6 +10,8 @@ class Settings
     public int IntervalSeconds { get; set; } = 300;
     public double SizeFactor { get; set; } = 0.85;
     public string Language { get; set; } = "";
+    public bool ShowReset { get; set; } = true;
+    public bool Notify { get; set; } = true;
 
     public static Settings Load()
     {

@@ -58,6 +58,13 @@ class TrayApp : ApplicationContext
     readonly ToolStripMenuItem _sizeMenu = new() { Padding = ItemPadding };
     readonly ToolStripMenuItem _languageMenu = new() { Padding = ItemPadding };
     readonly ToolStripMenuItem _startupItem = new() { Padding = ItemPadding };
+    readonly ToolStripMenuItem _resetItem = new() { Padding = ItemPadding };
+    readonly ToolStripMenuItem _notifyItem = new() { Padding = ItemPadding };
+    readonly ToolStripMenuItem _updateItem = new() { Padding = ItemPadding, Visible = false };
+    readonly System.Windows.Forms.Timer _clock = new() { Interval = 30000 };
+    readonly int[] _alerted = { -1, -1 };
+    static readonly int[] Thresholds = { 70, 90, 100 };
+    string? _updateTag, _updateUrl, _toastedTag;
     readonly ToolStripMenuItem _usageItem = new() { Padding = ItemPadding };
     readonly ToolStripMenuItem _aboutItem = new() { Padding = ItemPadding };
     readonly ToolStripMenuItem _quitItem = new() { Padding = ItemPadding };
@@ -72,6 +79,12 @@ class TrayApp : ApplicationContext
     {
         _settings = settings;
         _strip.SetSize(_settings.SizeFactor);
+        _strip.ShowReset = _settings.ShowReset;
+        _clock.Tick += (_, _) => Reapply();
+        _clock.Start();
+        var updates = new System.Windows.Forms.Timer { Interval = 10000 };
+        updates.Tick += async (_, _) => { updates.Interval = 12 * 3600 * 1000; await CheckUpdateAsync(); };
+        updates.Start();
         _strip.ContextMenuStrip = BuildMenu();
 
         _timer.Interval = _settings.IntervalSeconds * 1000;
@@ -106,7 +119,11 @@ class TrayApp : ApplicationContext
             Padding = new Padding(8, 8, 8, 0)
         });
         menu.Items.Add(_status);
+        menu.Items.Add(_updateItem);
         menu.Items.Add(new ToolStripSeparator());
+        _updateItem.Click += (_, _) => { if (_updateUrl is not null) Open(_updateUrl); };
+        _resetItem.Click += (_, _) => { _settings.ShowReset = !_settings.ShowReset; _settings.Save(); _strip.ShowReset = _settings.ShowReset; Reapply(); };
+        _notifyItem.Click += (_, _) => { _settings.Notify = !_settings.Notify; _settings.Save(); };
 
         _refreshItem.Click += async (_, _) => await RefreshAsync();
         _signItem.Click += (_, _) => SignInOrOut();
@@ -134,6 +151,8 @@ class TrayApp : ApplicationContext
         menu.Items.Add(_intervalMenu);
         menu.Items.Add(_sizeMenu);
         menu.Items.Add(_languageMenu);
+        menu.Items.Add(_resetItem);
+        menu.Items.Add(_notifyItem);
         menu.Items.Add(_startupItem);
         menu.Items.Add(new ToolStripSeparator());
 
@@ -183,6 +202,12 @@ class TrayApp : ApplicationContext
         _languageMenu.Text = L.T("menu.language");
         _startupItem.Text = L.T("menu.startup");
         _startupItem.ShortcutKeyDisplayString = L.T(StartupEnabled() ? "on" : "off");
+        _resetItem.Text = L.T("menu.showreset");
+        _resetItem.ShortcutKeyDisplayString = L.T(_settings.ShowReset ? "on" : "off");
+        _notifyItem.Text = L.T("menu.notify");
+        _notifyItem.ShortcutKeyDisplayString = L.T(_settings.Notify ? "on" : "off");
+        _updateItem.Visible = _updateTag is not null;
+        if (_updateTag is not null) _updateItem.Text = L.T("menu.update", _updateTag);
         _usageItem.Text = L.T("menu.usage");
         _aboutItem.Text = L.T("menu.about");
         _quitItem.Text = L.T("menu.quit");
@@ -268,6 +293,7 @@ class TrayApp : ApplicationContext
             _lastAt = at;
             _failures = 0;
             Present(() => (usage, Tip(usage, L.T("tip.updated", L.Clock(at))), false));
+            CheckAlerts(usage);
         }
         catch (Exception ex)
         {
@@ -291,8 +317,57 @@ class TrayApp : ApplicationContext
         $"{L.T("tip.weekly")}: {u.Week:0}%{Resets(u.WeekResets, true)}\n" +
         footer;
 
-    static string Resets(DateTimeOffset? d, bool withDay) =>
-        d is null ? "" : L.T("tip.resets", L.Time(d.Value, withDay));
+    static string Resets(DateTimeOffset? d, bool withDay)
+    {
+        if (d is null) return "";
+        var left = d.Value - DateTimeOffset.Now;
+        return left > TimeSpan.Zero
+            ? L.T("tip.resets", L.Time(d.Value, withDay), L.Remaining(left, false))
+            : L.T("tip.resets0", L.Time(d.Value, withDay));
+    }
+
+    void CheckAlerts(Usage u)
+    {
+        var values = new[] { (u.FiveHour, u.FiveHourResets, "alert.five"), (u.Week, u.WeekResets, "alert.week") };
+        for (int i = 0; i < 2; i++)
+        {
+            var (pct, resets, nameKey) = values[i];
+            int level = Thresholds.LastOrDefault(t => Math.Round(pct) >= t);
+            int before = _alerted[i];
+            _alerted[i] = level;
+            if (before < 0 || level <= before || !_settings.Notify) continue; // first reading only sets the baseline
+
+            string left = resets is { } r && r > DateTimeOffset.Now ? L.T("alert.in", L.Remaining(r - DateTimeOffset.Now, false)) : "";
+            string name = L.T(nameKey);
+            Toast.Show(level >= 100 ? L.T("alert.full", name, left) : L.T("alert.level", name, level, left));
+        }
+    }
+
+    async Task CheckUpdateAsync()
+    {
+        try
+        {
+            using var req = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/canndidojs/emberbar/releases/latest");
+            req.Headers.UserAgent.ParseAdd("EmberBar/" + AppInfo.Version);
+            req.Headers.Accept.ParseAdd("application/vnd.github+json");
+            using var resp = await Http.SendAsync(req);
+            if (!resp.IsSuccessStatusCode) return;
+            using var json = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            string tag = json.RootElement.GetProperty("tag_name").GetString() ?? "";
+            string url = json.RootElement.GetProperty("html_url").GetString() ?? "";
+            if (!Version.TryParse(tag.TrimStart('v', 'V'), out var latest) || !Version.TryParse(AppInfo.Version, out var current)
+                || latest <= current || !url.StartsWith("https://github.com/")) return;
+            _updateTag = tag;
+            _updateUrl = url;
+            ApplyLanguage();
+            if (_toastedTag != tag)
+            {
+                _toastedTag = tag;
+                Toast.Show(L.T("update.toast", tag), () => Open(url));
+            }
+        }
+        catch { }
+    }
 
     static async Task<Usage> FetchAsync()
     {

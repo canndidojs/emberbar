@@ -79,12 +79,16 @@ Right-click the strip to open the menu.
 | **Refresh every** | 2, 5, 10, 15 or 30 minutes. The default is 5. |
 | **Strip size** | Small, medium or large. |
 | **Language** | English, Português (Brasil) or Español. The first run follows your Windows language. |
+| **Show time until reset** | Shows on the strip how long until each limit resets (e.g. `2h05`). On by default. |
+| **Usage alerts** | Windows notification when a limit reaches 70%, 90% and 100%. On by default. |
 | **Start with Windows** | Off by default. Shows *On* or *Off*. |
 | **Open usage page** | Opens your usage page in the browser. |
 | **About EmberBar** | Version, author, and a link to star the project. |
 | **Quit** | Closes the app. |
 
-Hover the strip to see the exact percentages, when each limit resets, and when the numbers were last updated.
+Hover the strip to see the exact percentages, when each limit resets (the time and how long is left), and when the numbers were last updated.
+
+When a new version is released, an *Update available* item appears at the top of the menu, plus a notification. Clicking it opens the release page.
 
 ### Good to know
 
@@ -97,15 +101,15 @@ Hover the strip to see the exact percentages, when each limit resets, and when t
 
 | | |
 |---|---|
-| **Network** | Only `api.anthropic.com` (your usage) and `platform.claude.com` (sign-in and session renewal). Your browser, not the app, opens the sign-in page. |
-| **Telemetry** | None. No analytics, no crash reports, no update checks. |
-| **Stores** | `%APPDATA%\EmberBar\auth.dat`, your session, encrypted with Windows DPAPI so only your Windows user can read it. And `%APPDATA%\EmberBar\settings.json`, with your interval, size and language. |
+| **Network** | Only `api.anthropic.com` (your usage), `platform.claude.com` (sign-in and session renewal) and `api.github.com` (to see whether a new version exists, at startup and every 12 hours; it sends only the app name and version). Your browser, not the app, opens the sign-in page. |
+| **Telemetry** | None. No analytics and no crash reports. |
+| **Stores** | `%APPDATA%\EmberBar\auth.dat`, your session, encrypted with Windows DPAPI so only your Windows user can read it. And `%APPDATA%\EmberBar\settings.json`, with your interval, size, language and options. |
 | **Registry** | Only if you turn on *Start with Windows*: one value under `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`. |
 | **Listens** | One request on `localhost`, on a random port, only while the sign-in window is waiting for you. |
 | **Screen** | Reads the color of **one pixel** of the taskbar so the strip's background matches it. Nothing is saved or sent. |
 | **Other apps** | Does not read or change any other program's files or logins. |
 
-To verify the network claim yourself: the only addresses the app contacts are `Url` in `Program.cs` and `TokenUrl` in `Auth.cs`.
+To verify the network claim yourself: the only addresses the app contacts are `Url` and the update check in `Program.cs`, and `TokenUrl` in `Auth.cs`.
 
 ## How sign-in works
 

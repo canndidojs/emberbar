@@ -79,12 +79,16 @@ Clique com o botão direito na faixa para abrir o menu.
 | **Atualizar a cada** | 2, 5, 10, 15 ou 30 minutos. O padrão é 5. |
 | **Tamanho da faixa** | Pequeno, médio ou grande. |
 | **Idioma** | English, Português (Brasil) ou Español. Na primeira vez segue o idioma do Windows. |
+| **Mostrar tempo até resetar** | Mostra na faixa quanto falta para cada limite reiniciar (ex.: `2h05`). Ligado por padrão. |
+| **Alertas de uso** | Notificação do Windows quando um limite chega a 70%, 90% e 100%. Ligado por padrão. |
 | **Iniciar com o Windows** | Desligado por padrão. Mostra *Ligado* ou *Desligado*. |
 | **Abrir página de uso** | Abre a sua página de uso no navegador. |
 | **Sobre o EmberBar** | Versão, autor e um link para dar estrela no projeto. |
 | **Sair** | Fecha o app. |
 
-Passe o mouse sobre a faixa para ver as porcentagens exatas, quando cada limite reinicia e quando os números foram atualizados pela última vez.
+Passe o mouse sobre a faixa para ver as porcentagens exatas, quando cada limite reinicia (o horário e quanto tempo falta) e quando os números foram atualizados pela última vez.
+
+Quando sai uma versão nova, aparece um item *Atualização disponível* no topo do menu e uma notificação. Clicar leva à página do release.
 
 ### Bom saber
 
@@ -97,15 +101,15 @@ Passe o mouse sobre a faixa para ver as porcentagens exatas, quando cada limite 
 
 | | |
 |---|---|
-| **Rede** | Só `api.anthropic.com` (o seu uso) e `platform.claude.com` (login e renovação da sessão). Quem abre a página de login é o seu navegador, e não o app. |
-| **Telemetria** | Nenhuma. Sem análise de uso, sem relatório de falhas, sem busca de atualizações. |
-| **Guarda** | `%APPDATA%\EmberBar\auth.dat`, a sua sessão, criptografada com o DPAPI do Windows para só o seu usuário conseguir ler. E `%APPDATA%\EmberBar\settings.json`, com intervalo, tamanho e idioma. |
+| **Rede** | Só `api.anthropic.com` (o seu uso), `platform.claude.com` (login e renovação da sessão) e `api.github.com` (para saber se há versão nova, ao abrir e a cada 12 horas; não envia nada além do nome e da versão do app). Quem abre a página de login é o seu navegador, e não o app. |
+| **Telemetria** | Nenhuma. Sem análise de uso e sem relatório de falhas. |
+| **Guarda** | `%APPDATA%\EmberBar\auth.dat`, a sua sessão, criptografada com o DPAPI do Windows para só o seu usuário conseguir ler. E `%APPDATA%\EmberBar\settings.json`, com intervalo, tamanho, idioma e opções. |
 | **Registro** | Só se você ligar *Iniciar com o Windows*: um valor em `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`. |
 | **Escuta** | Uma única requisição em `localhost`, em uma porta aleatória, só enquanto a janela de login espera por você. |
 | **Tela** | Lê a cor de **um pixel** da barra de tarefas para o fundo da faixa combinar com ela. Nada é salvo nem enviado. |
 | **Outros apps** | Não lê nem altera arquivos ou logins de nenhum outro programa. |
 
-Para conferir a rede você mesmo: os únicos endereços que o app contata são `Url` em `Program.cs` e `TokenUrl` em `Auth.cs`.
+Para conferir a rede você mesmo: os únicos endereços que o app contata são `Url` e a busca de atualização em `Program.cs`, e `TokenUrl` em `Auth.cs`.
 
 ## Como o login funciona
 

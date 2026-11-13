@@ -20,6 +20,8 @@ class TaskbarStrip : Form
     static readonly IntPtr HWND_TOPMOST = new(-1);
 
     double? _p5, _pWeek;
+    DateTimeOffset? _r5, _rWeek;
+    public bool ShowReset { get; set; } = true;
     bool _stale;
     Color _background = Color.FromArgb(230, 238, 242);
     Font? _font, _bold;
@@ -48,6 +50,8 @@ class TaskbarStrip : Form
     {
         _p5 = u?.FiveHour;
         _pWeek = u?.Week;
+        _r5 = u?.FiveHourResets;
+        _rWeek = u?.WeekResets;
         _stale = stale;
         _tip.SetToolTip(this, tooltip);
         Reposition();
@@ -134,6 +138,15 @@ class TaskbarStrip : Form
             x += t.Width;
         }
 
+        void Reset(DateTimeOffset? at)
+        {
+            if (!ShowReset || at is null) return;
+            var left = at.Value - DateTimeOffset.Now;
+            if (left <= TimeSpan.Zero) return;
+            x += (int)(k * 0.12);
+            Text("· " + L.Remaining(left, true), _font, gray);
+        }
+
         float r = (float)k * 0.28f;
         if (g is not null && Mark is not null)
         {
@@ -145,6 +158,7 @@ class TaskbarStrip : Form
 
         Text("5h", _font, gray);   x += (int)(k * 0.12);
         Text(Pct(_p5), _bold, _stale ? gray : ValueColor(_p5, text));
+        Reset(_r5);
         x += (int)(k * 0.28);
 
         if (g is not null) { using var pen = new Pen(Color.FromArgb(90, gray)); g.DrawLine(pen, x, height / 2f - (float)k * 0.22f, x, height / 2f + (float)k * 0.22f); }
@@ -152,6 +166,7 @@ class TaskbarStrip : Form
 
         Text(L.T("strip.week"), _font, gray);    x += (int)(k * 0.12);
         Text(Pct(_pWeek), _bold, _stale ? gray : ValueColor(_pWeek, text));
+        Reset(_rWeek);
         return x + (int)(k * 0.22);
     }
 

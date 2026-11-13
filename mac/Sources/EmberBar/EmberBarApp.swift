@@ -32,14 +32,13 @@ struct EmberBarApp: App {
     }
 
     private var label: some View {
-        Group {
-            if let u = store.usage {
-                // Colored text is not supported in the menu bar label; stale is shown with a trailing "?".
-                Text("5h \(Int(u.fiveHour.percent.rounded()))% · W \(Int(u.week.percent.rounded()))%\(store.stale ? " ?" : "")")
-            } else {
-                Text(signedIn ? "EmberBar …" : "EmberBar")
-            }
-        }
+        Image(nsImage: StatusImage.make(usage: store.usage, stale: store.stale, signedIn: signedIn))
+            .accessibilityLabel(accessibilityText)
+    }
+
+    private var accessibilityText: String {
+        guard let u = store.usage else { return "EmberBar" }
+        return "5-hour limit \(Int(u.fiveHour.percent.rounded())) percent, weekly limit \(Int(u.week.percent.rounded())) percent"
     }
 
     private func signIn() {

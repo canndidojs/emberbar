@@ -31,9 +31,6 @@ jobs:
           EMBERBAR_DEMO=1 .build/release/EmberBar > ../shots/app.log 2>&1 &
           sleep 12
           screencapture -x ../shots/full.png || true
-          # Top strip only (menu bar), full width.
-          W=$(sips -g pixelWidth ../shots/full.png | awk '/pixelWidth/ {print $2}')
-          sips --cropOffset 0 0 -c 80 "$W" ../shots/full.png --out ../shots/menubar.png || true
           ls -la ../shots
           pkill EmberBar || true
       - uses: actions/upload-artifact@v4

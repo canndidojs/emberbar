@@ -1,13 +1,24 @@
+import EmberBarCore
 import Foundation
 import Network
 
 /// One-shot HTTP server on a random loopback port that captures the OAuth redirect.
+///
+/// Hardening: loopback interface only, strict request validation (`CallbackRequest`),
+/// invalid requests never abort the sign-in, per-connection and overall timeouts,
+/// a small connection cap, and fixed response bodies (no request data is reflected).
 final class CallbackServer: @unchecked Sendable {
     private let expectedState: String
     private let queue = DispatchQueue(label: "emberbar.callback")
     private var listener: NWListener?
+    private var port: UInt16 = 0
     private var codeContinuation: CheckedContinuation<String, Error>?
     private var pending: Result<String, Error>?
+    private var connections = 0
+
+    private static let maxConnections = 8
+    private static let connectionTimeout: TimeInterval = 10
+    private static let overallTimeout: TimeInterval = 300
 
     init(expectedState: String) { self.expectedState = expectedState }
 
@@ -19,7 +30,7 @@ final class CallbackServer: @unchecked Sendable {
         self.listener = listener
         listener.newConnectionHandler = { [weak self] conn in self?.handle(conn) }
 
-        return try await withCheckedThrowingContinuation { cont in
+        let port: UInt16 = try await withCheckedThrowingContinuation { cont in
             var resumed = false
             listener.stateUpdateHandler = { state in
                 guard !resumed else { return }
@@ -36,16 +47,25 @@ final class CallbackServer: @unchecked Sendable {
             }
             listener.start(queue: queue)
         }
+        self.port = port
+        queue.asyncAfter(deadline: .now() + Self.overallTimeout) { [weak self] in
+            self?.finish(.failure(AuthError.timedOut))
+        }
+        return port
     }
 
     func stop() { listener?.cancel() }
 
     func waitForCode() async throws -> String {
-        try await withCheckedThrowingContinuation { cont in
-            queue.async {
-                if let result = self.pending { cont.resume(with: result) }
-                else { self.codeContinuation = cont }
+        try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { cont in
+                queue.async {
+                    if let result = self.pending { cont.resume(with: result) }
+                    else { self.codeContinuation = cont }
+                }
             }
+        } onCancel: {
+            queue.async { self.finish(.failure(CancellationError())) }
         }
     }
 
@@ -53,47 +73,50 @@ final class CallbackServer: @unchecked Sendable {
         if let cont = codeContinuation {
             codeContinuation = nil
             cont.resume(with: result)
-        } else {
+        } else if pending == nil {
             pending = result
         }
     }
 
     private func handle(_ conn: NWConnection) {
+        guard connections < Self.maxConnections else { conn.cancel(); return }
+        connections += 1
+        conn.stateUpdateHandler = { [weak self] state in
+            if case .cancelled = state { self?.connections -= 1 }
+        }
         conn.start(queue: queue)
-        conn.receive(minimumIncompleteLength: 1, maximumLength: 8192) { [weak self] data, _, _, _ in
+        queue.asyncAfter(deadline: .now() + Self.connectionTimeout) { conn.cancel() }
+
+        conn.receive(minimumIncompleteLength: 1, maximumLength: CallbackRequest.maxRequestBytes) { [weak self] data, _, _, _ in
             guard let self, let data, let text = String(data: data, encoding: .utf8) else { conn.cancel(); return }
-            let parts = text.components(separatedBy: "\r\n").first?.split(separator: " ") ?? []
-            guard parts.count >= 2, parts[1].hasPrefix("/callback") else {
-                self.reply(conn, "Not found.", status: 404)
-                return
-            }
 
-            let items = URLComponents(string: "http://localhost" + parts[1])?.queryItems ?? []
-            func value(_ name: String) -> String? { items.first { $0.name == name }?.value }
-
-            if let error = value("error") {
-                self.reply(conn, "Sign-in failed: \(error)", status: 400)
+            switch CallbackRequest.evaluate(raw: text, expectedState: self.expectedState, port: self.port) {
+            case .reject(let status):
+                self.reply(conn, status == 404 ? "Not found." : "Invalid request.", status: status)
+            case .providerError:
+                self.reply(conn, "Sign-in failed. You can close this tab.", status: 400)
                 self.finish(.failure(AuthError.badResponse))
-            } else if value("state") != self.expectedState || (value("code") ?? "").isEmpty {
-                self.reply(conn, "Invalid response.", status: 400)
-                self.finish(.failure(AuthError.badResponse))
-            } else {
+            case .code(let code):
                 self.reply(conn, "Signed in. You can close this tab.", status: 200)
-                self.finish(.success(value("code")!))
+                self.finish(.success(code))
             }
         }
     }
 
     private func reply(_ conn: NWConnection, _ message: String, status: Int) {
-        let escaped = message
-            .replacingOccurrences(of: "&", with: "&amp;")
-            .replacingOccurrences(of: "<", with: "&lt;")
-            .replacingOccurrences(of: ">", with: "&gt;")
+        // `message` is always one of our own constants, never request data.
         let html = "<!doctype html><meta charset=utf-8><title>EmberBar</title>"
             + "<body style=\"margin:0;height:100vh;display:grid;place-items:center;background:#000;color:#fff;font:16px -apple-system,sans-serif\">"
-            + "<p>\(escaped)</p>"
+            + "<p>\(message)</p>"
         let body = Data(html.utf8)
-        let head = "HTTP/1.1 \(status) OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: \(body.count)\r\nConnection: close\r\n\r\n"
+        let head = "HTTP/1.1 \(status) \(status == 200 ? "OK" : "Error")\r\n"
+            + "Content-Type: text/html; charset=utf-8\r\n"
+            + "Content-Length: \(body.count)\r\n"
+            + "Cache-Control: no-store\r\n"
+            + "Referrer-Policy: no-referrer\r\n"
+            + "X-Content-Type-Options: nosniff\r\n"
+            + "Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'\r\n"
+            + "Connection: close\r\n\r\n"
         conn.send(content: Data(head.utf8) + body, completion: .contentProcessed { _ in conn.cancel() })
     }
 }

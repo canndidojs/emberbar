@@ -18,7 +18,10 @@ public enum UsageParser {
     private static func window(_ root: [String: Any], _ field: String) throws -> UsageWindow {
         guard let w = root[field] as? [String: Any] else { throw UsageParseError.missingField(field) }
         // NSNumber also matches Bool; reject it so `true` is not read as 1%.
-        guard let u = w["utilization"] as? NSNumber, CFGetTypeID(u) != CFBooleanGetTypeID() else {
+        guard let u = w["utilization"] as? NSNumber, CFGetTypeID(u) != CFBooleanGetTypeID(),
+              u.doubleValue.isFinite, (0...1000).contains(u.doubleValue)
+        else {
+            // Out-of-range values would otherwise crash `Int(_)` conversions when drawn.
             throw UsageParseError.badValue(field)
         }
         return UsageWindow(percent: u.doubleValue, resetsAt: (w["resets_at"] as? String).flatMap(parseDate))

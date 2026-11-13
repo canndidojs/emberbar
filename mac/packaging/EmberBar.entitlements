@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- App Sandbox: the app cannot read or write files outside its own container. -->
+    <key>com.apple.security.app-sandbox</key><true/>
+    <!-- Outgoing HTTPS to Anthropic. -->
+    <key>com.apple.security.network.client</key><true/>
+    <!-- Loopback listener that receives the OAuth redirect during sign-in. -->
+    <key>com.apple.security.network.server</key><true/>
+</dict>
+</plist>

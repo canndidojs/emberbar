@@ -11,12 +11,18 @@ enum Keychain {
          kSecAttrAccount as String: account]
     }
 
-    static func save(_ data: Data, account: String) {
-        SecItemDelete(query(account) as CFDictionary)
+    /// Replaces the item. Device-only (never synced to iCloud or included in backups restored elsewhere).
+    @discardableResult
+    static func save(_ data: Data, account: String) -> Bool {
+        let update: [String: Any] = [kSecValueData as String: data,
+                                     kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly]
+        let status = SecItemUpdate(query(account) as CFDictionary, update as CFDictionary)
+        if status == errSecSuccess { return true }
+        guard status == errSecItemNotFound else { return false }
+
         var attrs = query(account)
-        attrs[kSecValueData as String] = data
-        attrs[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-        SecItemAdd(attrs as CFDictionary, nil)
+        attrs.merge(update) { _, new in new }
+        return SecItemAdd(attrs as CFDictionary, nil) == errSecSuccess
     }
 
     static func load(account: String) -> Data? {

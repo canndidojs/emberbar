@@ -7,6 +7,10 @@ on:
     paths: ["mac/**", ".github/workflows/mac-build.yml"]
   workflow_dispatch:
 
+# Least privilege: the workflow only reads the repository. No secrets are used.
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: macos-latest
@@ -14,28 +18,38 @@ jobs:
       run:
         working-directory: mac
     steps:
-      - uses: actions/checkout@v4
+      # Actions are pinned to commit SHAs (dependabot keeps them current).
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
       - name: Swift version
         run: swift --version
-      - name: Build (release)
-        run: swift build -c release
       - name: Unit tests
         run: swift test
+      - name: Package (universal, sandboxed, hardened runtime)
+        run: bash package.sh
 
-      # Best effort: run the app with fake values and screenshot the menu bar.
+      # Best effort: run the packaged, sandboxed app with fake values and screenshot the menu bar.
       # A failure here must not fail the build; the screenshot is only an aid.
       - name: Screenshot (demo mode)
         continue-on-error: true
         run: |
           mkdir -p ../shots
-          EMBERBAR_DEMO=1 .build/release/EmberBar > ../shots/app.log 2>&1 &
+          EMBERBAR_DEMO=1 dist/EmberBar.app/Contents/MacOS/EmberBar > ../shots/app.log 2>&1 &
           sleep 12
           screencapture -x ../shots/full.png || true
           ls -la ../shots
           pkill EmberBar || true
-      - uses: actions/upload-artifact@v4
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: mac-screenshots
           path: shots/
           if-no-files-found: ignore
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: EmberBar-mac
+          path: |
+            mac/dist/EmberBar-mac.zip
+            mac/dist/EmberBar-mac.zip.sha256

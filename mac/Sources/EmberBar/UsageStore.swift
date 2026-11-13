@@ -24,8 +24,8 @@ enum UsageClient {
         req.setValue("oauth-2025-04-20", forHTTPHeaderField: "anthropic-beta")
         req.setValue("EmberBar-mac", forHTTPHeaderField: "User-Agent")
 
-        let (data, resp) = try await URLSession.shared.data(for: req)
-        let status = (resp as? HTTPURLResponse)?.statusCode ?? 0
+        let (data, resp) = try await SecureSession.data(for: req)
+        let status = resp.statusCode
         guard (200..<300).contains(status) else {
             throw status == 429 ? UsageClientError.rateLimited : UsageClientError.http(status)
         }

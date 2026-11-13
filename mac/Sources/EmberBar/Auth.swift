@@ -14,9 +14,13 @@ enum AuthError: LocalizedError {
     case badResponse
     case server(Int)
     case noRefresh
+    case timedOut
+    case storage
 
     var errorDescription: String? {
         switch self {
+        case .timedOut: return "Sign-in timed out. Try again."
+        case .storage: return "Could not save the session in the Keychain."
         case .notSignedIn: return "Not signed in."
         case .expired: return "Session expired. Sign in again."
         case .badResponse: return "Invalid response from the sign-in page."
@@ -54,7 +58,7 @@ enum Auth {
             signOut()
             throw AuthError.expired
         }
-        save(t)
+        try save(t)
         return t.access
     }
 
@@ -92,7 +96,7 @@ enum Auth {
             "code_verifier": verifier,
             "state": state,
         ], previousRefresh: nil)
-        save(tokens)
+        try save(tokens)
     }
 
     // MARK: - Token endpoint
@@ -103,9 +107,8 @@ enum Auth {
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-        let (data, resp) = try await URLSession.shared.data(for: req)
-        let status = (resp as? HTTPURLResponse)?.statusCode ?? 0
-        guard (200..<300).contains(status) else { throw AuthError.server(status) }
+        let (data, resp) = try await SecureSession.data(for: req)
+        guard (200..<300).contains(resp.statusCode) else { throw AuthError.server(resp.statusCode) }
 
         guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
               let access = json["access_token"] as? String,
@@ -122,8 +125,10 @@ enum Auth {
 
     // MARK: - Storage
 
-    private static func save(_ t: Tokens) {
-        if let data = try? JSONEncoder().encode(t) { Keychain.save(data, account: account) }
+    private static func save(_ t: Tokens) throws {
+        guard let data = try? JSONEncoder().encode(t), Keychain.save(data, account: account) else {
+            throw AuthError.storage
+        }
     }
 
     private static func load() -> Tokens? {

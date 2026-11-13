@@ -13,8 +13,9 @@ pattern='gh[pousr]_[A-Za-z0-9]{20,}|sk-ant-[A-Za-z0-9_-]{10,}|eyJ[A-Za-z0-9_-]{2
 hits=$(git grep -nIE "$pattern" -- . ':!.github/scripts/privacy-guard.sh' ':!*.png' ':!*.ico' || true)
 if [ -n "$hits" ]; then echo "Possible secret or personal data:"; echo "$hits"; fail=1; fi
 
-# 3) Commit authors must use the GitHub noreply address, not a real mailbox.
-emails=$(git log --format='%ae%n%ce' | sort -u | grep -v '@users.noreply.github.com' || true)
+# 3) Commit authors must use a GitHub noreply address (also GitHub's own noreply@github.com, used for
+#    the temporary merge commit in pull request runs), never a real mailbox.
+emails=$(git log --format='%ae%n%ce' | sort -u | grep -vE '(@users\.noreply\.github\.com|^noreply@github\.com)$' || true)
 if [ -n "$emails" ]; then echo "Commit e-mail is not a noreply address:"; echo "$emails"; fail=1; fi
 
 [ $fail -eq 0 ] && echo "privacy guard: clean"

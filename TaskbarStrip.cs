@@ -21,7 +21,7 @@ class TaskbarStrip : Form
 
     double? _p5, _pWeek;
     DateTimeOffset? _r5, _rWeek;
-    public bool ShowReset { get; set; } = true;
+    bool _hover;
     bool _stale;
     Color _background = Color.FromArgb(230, 238, 242);
     Font? _font, _bold;
@@ -36,6 +36,8 @@ class TaskbarStrip : Form
         TopMost = true;
         StartPosition = FormStartPosition.Manual;
         DoubleBuffered = true;
+        MouseEnter += (_, _) => { _hover = true; Reposition(); };
+        MouseLeave += (_, _) => { _hover = false; Reposition(); };
         _timer.Tick += (_, _) => Reposition();
         _timer.Start();
     }
@@ -140,7 +142,7 @@ class TaskbarStrip : Form
 
         void Reset(DateTimeOffset? at)
         {
-            if (!ShowReset || at is null) return;
+            if (!_hover || at is null) return;
             var left = at.Value - DateTimeOffset.Now;
             if (left <= TimeSpan.Zero) return;
             x += (int)(k * 0.12);

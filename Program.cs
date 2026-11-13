@@ -58,7 +58,6 @@ class TrayApp : ApplicationContext
     readonly ToolStripMenuItem _sizeMenu = new() { Padding = ItemPadding };
     readonly ToolStripMenuItem _languageMenu = new() { Padding = ItemPadding };
     readonly ToolStripMenuItem _startupItem = new() { Padding = ItemPadding };
-    readonly ToolStripMenuItem _resetItem = new() { Padding = ItemPadding };
     readonly ToolStripMenuItem _notifyItem = new() { Padding = ItemPadding };
     readonly ToolStripMenuItem _updateItem = new() { Padding = ItemPadding, Visible = false };
     readonly System.Windows.Forms.Timer _clock = new() { Interval = 30000 };
@@ -79,7 +78,6 @@ class TrayApp : ApplicationContext
     {
         _settings = settings;
         _strip.SetSize(_settings.SizeFactor);
-        _strip.ShowReset = _settings.ShowReset;
         _clock.Tick += (_, _) => Reapply();
         _clock.Start();
         var updates = new System.Windows.Forms.Timer { Interval = 10000 };
@@ -122,7 +120,6 @@ class TrayApp : ApplicationContext
         menu.Items.Add(_updateItem);
         menu.Items.Add(new ToolStripSeparator());
         _updateItem.Click += (_, _) => { if (_updateUrl is not null) Open(_updateUrl); };
-        _resetItem.Click += (_, _) => { _settings.ShowReset = !_settings.ShowReset; _settings.Save(); _strip.ShowReset = _settings.ShowReset; Reapply(); };
         _notifyItem.Click += (_, _) => { _settings.Notify = !_settings.Notify; _settings.Save(); };
 
         _refreshItem.Click += async (_, _) => await RefreshAsync();
@@ -151,7 +148,6 @@ class TrayApp : ApplicationContext
         menu.Items.Add(_intervalMenu);
         menu.Items.Add(_sizeMenu);
         menu.Items.Add(_languageMenu);
-        menu.Items.Add(_resetItem);
         menu.Items.Add(_notifyItem);
         menu.Items.Add(_startupItem);
         menu.Items.Add(new ToolStripSeparator());
@@ -202,8 +198,6 @@ class TrayApp : ApplicationContext
         _languageMenu.Text = L.T("menu.language");
         _startupItem.Text = L.T("menu.startup");
         _startupItem.ShortcutKeyDisplayString = L.T(StartupEnabled() ? "on" : "off");
-        _resetItem.Text = L.T("menu.showreset");
-        _resetItem.ShortcutKeyDisplayString = L.T(_settings.ShowReset ? "on" : "off");
         _notifyItem.Text = L.T("menu.notify");
         _notifyItem.ShortcutKeyDisplayString = L.T(_settings.Notify ? "on" : "off");
         _updateItem.Visible = _updateTag is not null;

@@ -82,7 +82,6 @@ static class L
         ["tip.weekly"] = new[] { "Weekly", "Semanal", "Semanal" },
         ["tip.resets"] = new[] { " (resets {0}, in {1})", " (reinicia {0}, em {1})", " (se restablece {0}, en {1})" },
         ["tip.resets0"] = new[] { " (resets {0})", " (reinicia {0})", " (se restablece {0})" },
-        ["menu.showreset"] = new[] { "Show time until reset", "Mostrar tempo até resetar", "Mostrar tiempo hasta el reinicio" },
         ["menu.notify"] = new[] { "Usage alerts", "Alertas de uso", "Alertas de uso" },
         ["menu.update"] = new[] { "Update available: {0}", "Atualização disponível: {0}", "Actualización disponible: {0}" },
         ["alert.level"] = new[] { "{0} usage reached {1}%.{2}", "Uso {0} chegou a {1}%.{2}", "El uso {0} llegó al {1}%.{2}" },

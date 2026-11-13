@@ -79,14 +79,13 @@ Clique com o botão direito na faixa para abrir o menu.
 | **Atualizar a cada** | 2, 5, 10, 15 ou 30 minutos. O padrão é 5. |
 | **Tamanho da faixa** | Pequeno, médio ou grande. |
 | **Idioma** | English, Português (Brasil) ou Español. Na primeira vez segue o idioma do Windows. |
-| **Mostrar tempo até resetar** | Mostra na faixa quanto falta para cada limite reiniciar (ex.: `2h05`). Ligado por padrão. |
 | **Alertas de uso** | Notificação do Windows quando um limite chega a 70%, 90% e 100%. Ligado por padrão. |
 | **Iniciar com o Windows** | Desligado por padrão. Mostra *Ligado* ou *Desligado*. |
 | **Abrir página de uso** | Abre a sua página de uso no navegador. |
 | **Sobre o EmberBar** | Versão, autor e um link para dar estrela no projeto. |
 | **Sair** | Fecha o app. |
 
-Passe o mouse sobre a faixa para ver as porcentagens exatas, quando cada limite reinicia (o horário e quanto tempo falta) e quando os números foram atualizados pela última vez.
+Ao passar o mouse sobre a faixa, ela mostra quanto falta para cada limite reiniciar (ex.: `2h05`) e o tooltip traz as porcentagens exatas, quando cada limite reinicia (o horário e quanto tempo falta) e quando os números foram atualizados pela última vez.
 
 Quando sai uma versão nova, aparece um item *Atualização disponível* no topo do menu e uma notificação. Clicar leva à página do release.
 

@@ -20,13 +20,12 @@ class TaskbarStrip : Form
     static readonly IntPtr HWND_TOPMOST = new(-1);
 
     double? _p5, _pWeek;
-    DateTimeOffset? _r5, _rWeek;
-    bool _hover;
+    string _tipText = "";
+    readonly HoverCard _card = new();
     bool _stale;
     Color _background = Color.FromArgb(230, 238, 242);
     Font? _font, _bold;
     int _fontPx;
-    readonly ToolTip _tip = new();
     readonly System.Windows.Forms.Timer _timer = new() { Interval = 2000 };
 
     public TaskbarStrip()
@@ -36,8 +35,8 @@ class TaskbarStrip : Form
         TopMost = true;
         StartPosition = FormStartPosition.Manual;
         DoubleBuffered = true;
-        MouseEnter += (_, _) => { _hover = true; Reposition(); };
-        MouseLeave += (_, _) => { _hover = false; Reposition(); };
+        MouseEnter += (_, _) => _card.ShowAbove(_tipText, Bounds, _fontPx);
+        MouseLeave += (_, _) => _card.Dismiss();
         _timer.Tick += (_, _) => Reposition();
         _timer.Start();
     }
@@ -52,10 +51,9 @@ class TaskbarStrip : Form
     {
         _p5 = u?.FiveHour;
         _pWeek = u?.Week;
-        _r5 = u?.FiveHourResets;
-        _rWeek = u?.WeekResets;
         _stale = stale;
-        _tip.SetToolTip(this, tooltip);
+        _tipText = tooltip;
+        _card.UpdateText(tooltip, _fontPx);
         Reposition();
         Invalidate();
     }
@@ -78,10 +76,10 @@ class TaskbarStrip : Form
         IntPtr bar = FindWindow("Shell_TrayWnd", null);
         if (bar == IntPtr.Zero || !GetWindowRect(bar, out RECT b)
             || (b.Right - b.Left) < (b.Bottom - b.Top) * 2 || FullScreen())
-        { if (Visible) Hide(); return; }
+        { HideAll(); return; }
 
         IntPtr tray = FindWindowEx(bar, IntPtr.Zero, "TrayNotifyWnd", null);
-        if (tray == IntPtr.Zero || !GetWindowRect(tray, out RECT n)) { if (Visible) Hide(); return; }
+        if (tray == IntPtr.Zero || !GetWindowRect(tray, out RECT n)) { HideAll(); return; }
 
         int height = b.Bottom - b.Top - 1; // keep the taskbar's 1px top border visible
         PrepareFonts(height);
@@ -92,6 +90,12 @@ class TaskbarStrip : Form
         if (!Visible) base.Show();
         SetWindowPos(Handle, HWND_TOPMOST, x, b.Top + 1, width, height, SWP_NOACTIVATE | SWP_SHOWWINDOW);
         Invalidate();
+    }
+
+    void HideAll()
+    {
+        _card.Dismiss();
+        if (Visible) Hide();
     }
 
     static bool FullScreen() =>
@@ -140,15 +144,6 @@ class TaskbarStrip : Form
             x += t.Width;
         }
 
-        void Reset(DateTimeOffset? at)
-        {
-            if (!_hover || at is null) return;
-            var left = at.Value - DateTimeOffset.Now;
-            if (left <= TimeSpan.Zero) return;
-            x += (int)(k * 0.12);
-            Text("· " + L.Remaining(left, true), _font, gray);
-        }
-
         float r = (float)k * 0.28f;
         if (g is not null && Mark is not null)
         {
@@ -160,7 +155,6 @@ class TaskbarStrip : Form
 
         Text("5h", _font, gray);   x += (int)(k * 0.12);
         Text(Pct(_p5), _bold, _stale ? gray : ValueColor(_p5, text));
-        Reset(_r5);
         x += (int)(k * 0.28);
 
         if (g is not null) { using var pen = new Pen(Color.FromArgb(90, gray)); g.DrawLine(pen, x, height / 2f - (float)k * 0.22f, x, height / 2f + (float)k * 0.22f); }
@@ -168,7 +162,6 @@ class TaskbarStrip : Form
 
         Text(L.T("strip.week"), _font, gray);    x += (int)(k * 0.12);
         Text(Pct(_pWeek), _bold, _stale ? gray : ValueColor(_pWeek, text));
-        Reset(_rWeek);
         return x + (int)(k * 0.22);
     }
 
@@ -185,7 +178,7 @@ class TaskbarStrip : Form
     }
     protected override void Dispose(bool disposing)
     {
-        if (disposing) { _timer.Dispose(); _tip.Dispose(); _font?.Dispose(); _bold?.Dispose(); }
+        if (disposing) { _timer.Dispose(); _card.Dispose(); _font?.Dispose(); _bold?.Dispose(); }
         base.Dispose(disposing);
     }
 }

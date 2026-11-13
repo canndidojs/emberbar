@@ -85,7 +85,7 @@ Right-click the strip to open the menu.
 | **About EmberBar** | Version, author, and a link to star the project. |
 | **Quit** | Closes the app. |
 
-Hovering the strip shows how long until each limit resets (e.g. `2h05`), and the tooltip gives the exact percentages, when each limit resets (the time and how long is left), and when the numbers were last updated.
+Hovering the strip shows a small card right above it (with a fade animation) with the exact percentages, when each limit resets (the time and how long is left), and when the numbers were last updated.
 
 When a new version is released, an *Update available* item appears at the top of the menu, plus a notification. Clicking it opens the release page.
 

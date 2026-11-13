@@ -85,7 +85,7 @@ Clique com o botão direito na faixa para abrir o menu.
 | **Sobre o EmberBar** | Versão, autor e um link para dar estrela no projeto. |
 | **Sair** | Fecha o app. |
 
-Ao passar o mouse sobre a faixa, ela mostra quanto falta para cada limite reiniciar (ex.: `2h05`) e o tooltip traz as porcentagens exatas, quando cada limite reinicia (o horário e quanto tempo falta) e quando os números foram atualizados pela última vez.
+Ao passar o mouse sobre a faixa, aparece um cartãozinho logo acima dela (com animação) com as porcentagens exatas, quando cada limite reinicia (o horário e quanto tempo falta) e quando os números foram atualizados pela última vez.
 
 Quando sai uma versão nova, aparece um item *Atualização disponível* no topo do menu e uma notificação. Clicar leva à página do release.
 
